@@ -1,0 +1,19 @@
+{
+  "name": "webgl-heatmap",
+  "version": "0.0.1",
+  "description": "webgl-heatmap.js is a JavaScript library for high performance heatmap display.",
+  "main": "webgl-heatmap.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dirkmoors/webgl-heatmap.git"
+  },
+  "author": "Florian Bösch",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dirkmoors/webgl-heatmap/issues"
+  },
+  "homepage": "https://github.com/dirkmoors/webgl-heatmap#readme"
+}
