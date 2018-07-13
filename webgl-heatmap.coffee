@@ -83,9 +83,9 @@ textureFloatShims = ->
         gl.linkProgram(program)
         if not gl.getProgramParameter(program, gl.LINK_STATUS)
             throw gl.getProgramInfoLog(program)
-        
+
         gl.useProgram(program)
-        
+
         cleanup = ->
             gl.deleteShader(fragmentShader)
             gl.deleteShader(vertexShader)
@@ -126,7 +126,7 @@ textureFloatShims = ->
             target,
             0
         )
-        
+
         ## source texture ##
         sourceCanvas = createSourceCanvas()
         source = gl.createTexture()
@@ -142,8 +142,8 @@ textureFloatShims = ->
 
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-                   
-        ## create VBO ## 
+
+        ## create VBO ##
         vertices = new Float32Array([
              1,  1,
             -1,  1,
@@ -162,10 +162,10 @@ textureFloatShims = ->
         gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0)
         gl.uniform1i(sourceLoc, 0)
         gl.drawArrays(gl.TRIANGLES, 0, 6)
-        
+
         readBuffer = new Uint8Array(4*4)
         gl.readPixels(0, 0, 2, 2, gl.RGBA, gl.UNSIGNED_BYTE, readBuffer)
-       
+
         result = Math.abs(readBuffer[0] - 127) < 10
 
         cleanup()
@@ -205,7 +205,7 @@ textureFloatShims = ->
             targetType,
             null,
         )
-        
+
         framebuffer = gl.createFramebuffer()
         gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
         gl.framebufferTexture2D(
@@ -215,7 +215,7 @@ textureFloatShims = ->
             target,
             0
         )
-        
+
         check = gl.checkFramebufferStatus(gl.FRAMEBUFFER)
 
         gl.deleteTexture(target)
@@ -290,7 +290,7 @@ textureFloatShims = ->
                         shimExtensions.push 'OES_texture_float_linear'
                     else
                         unshimExtensions.push 'OES_texture_float_linear'
-            
+
             halfFloatExt = gl.getExtension 'OES_texture_half_float'
             if halfFloatExt == null
                 if checkTexture(gl, 0x8D61)
@@ -330,7 +330,7 @@ textureFloatShims = ->
                         shimExtensions.push 'EXT_color_buffer_half_float'
                     else
                         unshimExtensions.push 'EXT_color_buffer_half_float'
-                
+
                 extobj = gl.getExtension 'OES_texture_half_float_linear'
                 if extobj == null
                     if checkFloatLinear gl, halfFloatExt.HALF_FLOAT_OES
@@ -343,7 +343,7 @@ textureFloatShims = ->
                         shimExtensions.push 'OES_texture_half_float_linear'
                     else
                         unshimExtensions.push 'OES_texture_half_float_linear'
-       
+
     if window.WebGLRenderingContext?
         checkSupport()
 
@@ -361,7 +361,7 @@ textureFloatShims = ->
                     return getExtension.call @, name
             else
                 return extobj
-        
+
         getSupportedExtensions = WebGLRenderingContext.prototype.getSupportedExtensions
         WebGLRenderingContext.prototype.getSupportedExtensions = ->
             supported = getSupportedExtensions.call(@)
@@ -399,7 +399,7 @@ textureFloatShims = ->
                 single: true
                 type: @FLOAT
             }
-            
+
             half = {
                 texture: halfTexture != null
                 filterable: halfLinear != null
@@ -468,20 +468,20 @@ class Shader
         @value_cache = {}
         @uniform_cache = {}
         @attribCache = {}
-    
+
     attribLocation: (name) ->
         location = @attribCache[name]
         if location is undefined
             location = @attribCache[name] = @gl.getAttribLocation @program, name
         return location
-    
+
     compileShader: (shader, source) ->
         @gl.shaderSource shader, source
         @gl.compileShader shader
 
         if not @gl.getShaderParameter shader, @gl.COMPILE_STATUS
             throw "Shader Compile Error: #{@gl.getShaderInfoLog(shader)}"
-    
+
     link: ->
         @gl.linkProgram @program
 
@@ -491,13 +491,13 @@ class Shader
     use: ->
         @gl.useProgram @program
         return @
-    
+
     uniformLoc: (name) ->
         location = @uniform_cache[name]
         if location is undefined
             location = @uniform_cache[name] = @gl.getUniformLocation @program, name
         return location
-    
+
     int: (name, value) ->
         cached = @value_cache[name]
         if cached != value
@@ -505,12 +505,12 @@ class Shader
             loc = @uniformLoc name
             @gl.uniform1i loc, value if loc
         return @
-    
+
     vec2: (name, a, b) ->
         loc = @uniformLoc name
         @gl.uniform2f loc, a, b if loc
         return @
-            
+
     float: (name, value) ->
         cached = @value_cache[name]
         if cached != value
@@ -551,7 +551,7 @@ class Framebuffer
         @gl.framebufferTexture2D @gl.FRAMEBUFFER, @gl.COLOR_ATTACHMENT0, texture.target, texture.handle, 0
         @check()
         return @
-    
+
     depth: (buffer) ->
         @gl.framebufferRenderbuffer @gl.FRAMEBUFFER, @gl.DEPTH_ATTACHMENT, @gl.RENDERBUFFER, buffer.id
         @check()
@@ -580,7 +580,7 @@ class Texture
 
     destroy: ->
         @gl.deleteTexture @handle
-    
+
     bind: (unit=0) ->
         if unit > 15
             throw 'Texture unit too large: ' + unit
@@ -593,19 +593,19 @@ class Texture
     setSize: (@width, @height) ->
         @gl.texImage2D @target, 0, @channels, @width, @height, 0, @channels, @type, null
         return @
-    
+
     upload: (data) ->
         @width = data.width
         @height = data.height
 
         @gl.texImage2D @target, 0, @channels, @channels, @type, data
         return @
-    
+
     linear: ->
         @gl.texParameteri @target, @gl.TEXTURE_MAG_FILTER, @gl.LINEAR
         @gl.texParameteri @target, @gl.TEXTURE_MIN_FILTER, @gl.LINEAR
         return @
-    
+
     nearest: ->
         @gl.texParameteri @target, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST
         @gl.texParameteri @target, @gl.TEXTURE_MIN_FILTER, @gl.NEAREST
@@ -615,7 +615,7 @@ class Texture
         @gl.texParameteri @target, @gl.TEXTURE_WRAP_S, @gl.CLAMP_TO_EDGE
         @gl.texParameteri @target, @gl.TEXTURE_WRAP_T, @gl.CLAMP_TO_EDGE
         return @
-    
+
     repeat: ->
         @gl.texParameteri @target, @gl.TEXTURE_WRAP_S, @gl.REPEAT
         @gl.texParameteri @target, @gl.TEXTURE_WRAP_T, @gl.REPEAT
@@ -697,7 +697,7 @@ class Heights
                     gl_FragColor = vec4(clamp(texture2D(source, texcoord).rgb, low, high), 1.0);
                 }
             '''
-        
+
         @multiplyShader = new Shader @gl,
             vertex: vertexShaderBlit
             fragment: fragmentShaderBlit + '''
@@ -706,7 +706,7 @@ class Heights
                     gl_FragColor = vec4(texture2D(source, texcoord).rgb*value, 1.0);
                 }
             '''
-        
+
         @blurShader = new Shader @gl,
             vertex: vertexShaderBlit
             fragment: fragmentShaderBlit + '''
@@ -727,7 +727,7 @@ class Heights
 
         @nodeBack = new Node @gl, @width, @height
         @nodeFront = new Node @gl, @width, @height
-        
+
         @vertexBuffer = @gl.createBuffer()
         @vertexSize = 8
         @maxPointCount = 1024*10
@@ -754,7 +754,7 @@ class Heights
 
             positionLoc = @shader.attribLocation('position')
             intensityLoc = @shader.attribLocation('intensity')
-            
+
             @gl.enableVertexAttribArray 1
             @gl.vertexAttribPointer(positionLoc, 4, @gl.FLOAT, false, 8*4, 0*4)
             @gl.vertexAttribPointer(intensityLoc, 4, @gl.FLOAT, false, 8*4, 4*4)
@@ -783,7 +783,7 @@ class Heights
         @gl.drawArrays @gl.TRIANGLES, 0, 6
         @nodeBack.end()
         @swap()
-    
+
     multiply: (value) ->
         @gl.bindBuffer @gl.ARRAY_BUFFER, @heatmap.quad
         @gl.vertexAttribPointer(0, 4, @gl.FLOAT, false, 0, 0)
@@ -829,14 +829,14 @@ class Heights
         @addVertex x, y, -s, -s, intensity
         @addVertex x, y, +s, -s, intensity
         @addVertex x, y, -s, +s, intensity
-        
+
         @addVertex x, y, -s, +s, intensity
         @addVertex x, y, +s, -s, intensity
         @addVertex x, y, +s, +s, intensity
 
         @pointCount += 1
 
-class WebGLHeatmap
+module.exports = class WebGLHeatmap
     constructor: ({@canvas, @width, @height, intensityToAlpha, gradientTexture, alphaRange}={}) ->
         @canvas = document.createElement('canvas') unless @canvas
         try
@@ -943,23 +943,23 @@ class WebGLHeatmap
         @canvas.width = @width
         @canvas.height = @height
         @gl.viewport(0, 0, @width, @height)
-        
+
         @quad = @gl.createBuffer()
         @gl.bindBuffer @gl.ARRAY_BUFFER, @quad
         quad = new Float32Array([
             -1, -1, 0, 1,
             1, -1, 0, 1,
             -1, 1, 0, 1,
-            
+
             -1, 1, 0, 1,
             1, -1, 0, 1,
             1, 1, 0, 1,
         ])
         @gl.bufferData @gl.ARRAY_BUFFER, quad, @gl.STATIC_DRAW
         @gl.bindBuffer @gl.ARRAY_BUFFER, null
-        
+
         @heights = new Heights @, @gl, @width, @height
-    
+
     adjustSize: ->
         canvasWidth = @canvas.offsetWidth or 2
         canvasHeight = @canvas.offsetHeight or 2
